@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Robux Generator (Demo Project)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #4e54c8, #8f94fb);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: white;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      margin-top: 60px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h1, h2, h3 {
+      margin-bottom: 15px;
+    }
+
+    input, select, button {
+      padding: 10px;
+      width: 90%;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    input, select {
+      background-color: #ffffff;
+      color: #333;
+    }
+
+    button {
+      background-color: #00c853;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #00b342;
+    }
+
+    #successMessage, #userList, #passwordPrompt, #step2, #step3 {
+      display: none;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 10px 0;
+    }
+
+    li {
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .footer-note {
+      font-size: 12px;
+      margin-top: 30px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Robux Generator</h1>
+
+    <div id="step1">
+      <button onclick="showStep2()">🎮 Generate Code</button>
+    </div>
+
+    <div id="step2">
+      <h3>Select how many Robux you want:</h3>
+      <select id="robuxAmount">
+        <option value="100">100 Robux</option>
+        <option value="500">500 Robux</option>
+        <option value="1000">1000 Robux</option>
+      </select>
+      <br />
+      <button onclick="showStep3()">➡️ Continue</button>
+    </div>
+
+    <div id="step3">
+      <h3>Roblox Username:</h3>
+      <input type="text" id="robloxName" placeholder="Roblox Username" />
+      <h3>Demo Password:</h3>
+      <input type="password" id="robloxPassword" placeholder="Demo Password" />
+      <br />
+      <button onclick="signUp()">✅ Sign Up</button>
+    </div>
+
+    <div id="successMessage">
+      <h2>✅ Robux have been added to your account!</h2>
+      <button onclick="promptPassword()">👥 See all users</button>
+    </div>
+
+    <div id="passwordPrompt">
+      <h3>Enter password to see all users:</h3>
+      <input type="password" id="adminPassword" placeholder="Password" />
+      <br />
+      <button onclick="checkPassword()">Submit</button>
+      <button onclick="cancelPassword()">Cancel</button>
+    </div>
+
+    <div id="userList">
+      <h3>Registered users:</h3>
+      <ul id="userListItems"></ul>
+      <button onclick="hideUserList()">Close</button>
+    </div>
+
+    <p class="footer-note">
+      * This is a demo school project – no real data is sent and no real Robux
+      are generated.
+    </p>
+  </div>
+
+  <script>
+    function showStep2() {
+      document.getElementById('step1').style.display = 'none';
+      document.getElementById('step2').style.display = 'block';
+    }
+
+    function showStep3() {
+      document.getElementById('step2').style.display = 'none';
+      document.getElementById('step3').style.display = 'block';
+    }
+
+    function signUp() {
+      const username = document.getElementById('robloxName').value.trim();
+      const password = document.getElementById('robloxPassword').value.trim();
+      const robux = document.getElementById('robuxAmount').value;
+
+      if (username === '' || password === '') {
+        alert('Please fill in both username and demo password.');
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      users.push({ username, password, robux });
+      localStorage.setItem('users', JSON.stringify(users));
+
+      document.getElementById('step3').style.display = 'none';
+      document.getElementById('successMessage').style.display = 'block';
+    }
+
+    function promptPassword() {
+      document.getElementById('passwordPrompt').style.display = 'block';
+    }
+
+    function cancelPassword() {
+      document.getElementById('passwordPrompt').style.display = 'none';
+    }
+
+    function checkPassword() {
+      const entered = document.getElementById('adminPassword').value;
+      if (entered === '1403') {
+        document.getElementById('passwordPrompt').style.display = 'none';
+        showUserList();
+      } else {
+        alert('Incorrect password!');
+      }
+      document.getElementById('adminPassword').value = '';
+    }
+
+    function showUserList() {
+      const userList = document.getElementById('userList');
+      const userListItems = document.getElementById('userListItems');
+      userListItems.innerHTML = '';
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+
+      if (users.length === 0) {
+        userListItems.innerHTML = '<li>No users registered yet.</li>';
+      } else {
+        users.forEach(user => {
+          const li = document.createElement('li');
+          li.textContent = `👤 ${user.username} | 🔐 ${user.password} | 💰 ${user.robux} Robux`;
+          userListItems.appendChild(li);
+        });
+      }
+
+      userList.style.display = 'block';
+    }
+
+    function hideUserList() {
+      document.getElementById('userList').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
